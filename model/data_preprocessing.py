@@ -28,10 +28,10 @@ class DataPreprocessing:
         df_cleaned = df.dropna(subset=null_col.values)
 
         #todo 데이터 클리닝 더 해야되는데 일단 다음 스텝으로 고
-
+        print(df_cleaned.info())
         # 처음부터 'Date' 컬럼의 타입을 datetime으로 바꿔놔야겠어.
         df_cleaned['Date'] = pd.to_datetime(df_cleaned['Date'])
-
+        print(df_cleaned.info())
         # todo When 'data cleaning' is done, I'm going to save it as a csv file
 
         output_file_path = 'data/bank_tracker.csv'

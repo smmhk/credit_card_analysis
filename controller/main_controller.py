@@ -1,7 +1,7 @@
 from model.data_preprocessing import DataPreprocessing
 from view.menu_view import MenuView
 import pandas as pd
-from datetime import datetime
+import matplotlib.pyplot as plt
 
 
 class MainController:
@@ -9,11 +9,9 @@ class MainController:
     def __init__(self, file_path):
         self.model = DataPreprocessing(file_path)
         self.view = MenuView()
-        # self.model.load_clean_data()
 
     def start(self):
         df_trs = pd.DataFrame()
-        """Start the main menu loop."""
         while True:
             self.view.call_menu()
             num = input("Choose an option (1-11): ")
@@ -66,24 +64,60 @@ class MainController:
                 df_trs.to_csv(output_file_path, index=False)
 
                 print("Transaction added successfully!")
-            elif num == '4':  #4. Edit a Transaction
+            elif num == '4':    #4. Edit a Transaction
                 idx = input("Enter the index of the transaction to edit:")
-                df_from_idx = df_trs.loc[int(idx)]
-                print(f"Current Transaction Details:\n{df_from_idx}")
+                index = int(idx)
+                if index in df_trs.index:
+                    df_from_idx = df_trs.loc[index]
+                    print(f"Current Transaction Details:\n{df_from_idx}")
 
-                edit_date = input("Enter new date (YYYY-MM-DD) or press Enter to keep current:")
-                edit_merchant = input("Enter new merchant or press Enter to keep current:")
-                edit_amount = input("Enter new amount or press Enter to keep current:")
-                edit_category = input("Enter new category or press Enter to keep current:")
+                    edit_date = input("Enter new date (YYYY-MM-DD) or press Enter to keep current:")
+                    edit_merchant = input("Enter new merchant or press Enter to keep current:")
+                    edit_amount = input("Enter new amount or press Enter to keep current:")
+                    edit_category = input("Enter new category or press Enter to keep current:")
 
-                if edit_date is not None:
-                    df_trs.loc[int(idx), 'Date'] = edit_date
-                if edit_merchant is not None:
-                    df_trs.loc[int(idx), 'Merchant'] = edit_merchant
-                if edit_amount is not None:
-                    df_trs.loc[int(idx), 'Amount'] = float(edit_amount)
-                if edit_category is not None:
-                    df_trs.loc[int(idx), 'Category'] = edit_category
+                    if edit_date:
+                        df_trs.loc[index, 'Date'] = edit_date
+                    if edit_merchant:
+                        df_trs.loc[index, 'Merchant'] = edit_merchant
+                    if edit_amount:
+                        df_trs.loc[index, 'Amount'] = float(edit_amount)
+                    if edit_category:
+                        df_trs.loc[index, 'Category'] = edit_category
 
-                print(df_trs)
-                # print(df_from_idx)
+                    print(f"{df_trs} \nTransaction updated successfully!")
+                else:
+                    print("Invalid index.")
+            elif num == '5':    #5. Delete a Transaction
+                idx = input("Enter the index of the transaction to delete:")
+                index = int(idx)
+                if index in df_trs.index:
+                    df_trs = df_trs.drop(index)
+                    if df_trs is not None:
+                        print(f"{df_trs} \nTransaction deleted successfully!")
+                else:
+                    print("Invalid index.")
+            elif num == '6':    # 6. Analyze Spending by Category
+                print("--- Total Spending by Category ---")
+                category_sums = df_trs.groupby('Category')['Amount'].sum()
+                print(category_sums)
+            elif num == '7':    # 7. Calculate Average Monthly Spending
+                df_trs['Date'] = pd.to_datetime(df_trs['Date'])
+                df_trs['Month'] = df_trs['Date'].dt.to_period('M')
+
+                # 월별 지출 총액
+                monthly_sums = df_trs.groupby('Month')['Amount'].sum()
+                print(monthly_sums)
+            elif num == '8':    # 8. Show Top Spending Category
+                print("--- Top Spending Category ---")
+                category_sums = df_trs.groupby('Category')['Amount'].sum()
+                sorted_category_sums = category_sums.sort_values(ascending=False)
+
+                print(sorted_category_sums)
+            elif num == '9':    # 9. Visualize Monthly Spending Trend
+                print("Visualize Monthly Spending Trend")
+
+            elif num == '10':   # 10. Save Transactions to CSV
+                file_name = input("Enter file name to save (e.g., 'transactions.csv'):")
+                df_trs.to_csv(f"data/{file_name}", index=False)
+                print(f"Transactions saved to {file_name} successfully!")

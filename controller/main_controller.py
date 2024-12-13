@@ -2,6 +2,7 @@ from model.data_preprocessing import DataPreprocessing
 from view.menu_view import MenuView
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 
 class MainController:
@@ -24,8 +25,7 @@ class MainController:
             elif num == '1':  # 1. View All Transactions
                 print(f"----- All Transactions ----- \n {df_trs}")
             elif num == '2':  # 2. View Transactions by Date Range
-                # Date 컬럼을 datetime 형식으로 변환
-                df_trs['Date'] = pd.to_datetime(df_trs['Date'])
+
                 start_date = input("Enter the start date (YYYY-MM-DD) : ")
                 end_date = input("Enter the end date (YYYY-MM-DD) : ")
 
@@ -45,7 +45,7 @@ class MainController:
 
                 # 새로운 행 생성
                 new_transaction = {
-                    'Date': new_date,
+                    'Date': datetime.strptime(new_date,'YYYY-MM-DD'),
                     'Merchant': new_merchant,
                     'Amount': new_amount,
                     'Category': new_category
@@ -116,6 +116,16 @@ class MainController:
                 print(sorted_category_sums)
             elif num == '9':    # 9. Visualize Monthly Spending Trend
                 print("Visualize Monthly Spending Trend")
+                df_trs['Date'] = pd.to_datetime(df_trs['Date'])
+                df_trs['Month'] = df_trs['Date'].dt.to_period('M')
+
+                # 월별 지출 총액
+                monthly_sums = df_trs.groupby('Month')['Amount'].sum()
+                print(monthly_sums)
+
+                plt.pie(df_trs['monthly_sums'])
+                plt.show()
+
 
             elif num == '10':   # 10. Save Transactions to CSV
                 file_name = input("Enter file name to save (e.g., 'transactions.csv'):")

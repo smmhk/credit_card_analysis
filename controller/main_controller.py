@@ -2,7 +2,7 @@ from model.data_preprocessing import DataPreprocessing
 from view.menu_view import MenuView
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
+from config.constants import FILE_NAME
 
 
 class MainController:
@@ -43,9 +43,10 @@ class MainController:
                 new_merchant = input("Enter the merchant : ")
                 new_amount = input("Enter the amount : ")
 
+                new_date = pd.to_datetime(new_date)
                 # 새로운 행 생성
                 new_transaction = {
-                    'Date': datetime.strptime(new_date,'YYYY-MM-DD'),
+                    'Date': new_date,
                     'Merchant': new_merchant,
                     'Amount': new_amount,
                     'Category': new_category
@@ -55,16 +56,14 @@ class MainController:
                 df_trs = df_trs._append(new_transaction, ignore_index=True)
 
                 # 날짜 순으로 정렬
-                df_trs.sort_values('Date', ascending=False, inplace=True)
+                df_trs = df_trs.sort_values(by='Date', ascending=False)
 
                 # .csv 파일로 저장
-                # timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-                # output_file_path = f'data/bank_tracker_{timestamp}.csv'
-                output_file_path = f'data/bank_tracker.csv'
-                df_trs.to_csv(output_file_path, index=False)
+                df_trs.to_csv(FILE_NAME, index=False)
 
-                print("Transaction added successfully!")
+                print(f"{df_trs} \nTransaction added successfully!")
             elif num == '4':    #4. Edit a Transaction
+                print(df_trs)
                 idx = input("Enter the index of the transaction to edit:")
                 index = int(idx)
                 if index in df_trs.index:
@@ -85,16 +84,24 @@ class MainController:
                     if edit_category:
                         df_trs.loc[index, 'Category'] = edit_category
 
+                    # 날짜 순으로 정렬
+                    df_trs = df_trs.sort_values(by='Date', ascending=False)
+
+                    # .csv 파일로 저장
+                    df_trs.to_csv(FILE_NAME, index=False)
+
                     print(f"{df_trs} \nTransaction updated successfully!")
                 else:
                     print("Invalid index.")
             elif num == '5':    #5. Delete a Transaction
+                print(df_trs)
                 idx = input("Enter the index of the transaction to delete:")
                 index = int(idx)
                 if index in df_trs.index:
                     df_trs = df_trs.drop(index)
-                    if df_trs is not None:
-                        print(f"{df_trs} \nTransaction deleted successfully!")
+                    # .csv 파일로 저장
+                    df_trs.to_csv(FILE_NAME, index=False)
+                    print(f"{df_trs} \nTransaction deleted successfully!")
                 else:
                     print("Invalid index.")
             elif num == '6':    # 6. Analyze Spending by Category

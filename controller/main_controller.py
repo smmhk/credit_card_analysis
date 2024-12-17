@@ -2,7 +2,7 @@ from model.data_preprocessing import DataPreprocessing
 from view.menu_view import MenuView
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
+from config.constants import FILE_NAME
 
 
 class MainController:
@@ -43,9 +43,10 @@ class MainController:
                 new_merchant = input("Enter the merchant : ")
                 new_amount = input("Enter the amount : ")
 
+                new_date = pd.to_datetime(new_date)
                 # 새로운 행 생성
                 new_transaction = {
-                    'Date': datetime.strptime(new_date,'YYYY-MM-DD'),
+                    'Date': new_date,
                     'Merchant': new_merchant,
                     'Amount': new_amount,
                     'Category': new_category
@@ -55,16 +56,14 @@ class MainController:
                 df_trs = df_trs._append(new_transaction, ignore_index=True)
 
                 # 날짜 순으로 정렬
-                df_trs.sort_values('Date', ascending=False, inplace=True)
+                df_trs = df_trs.sort_values(by='Date', ascending=False)
 
                 # .csv 파일로 저장
-                # timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-                # output_file_path = f'data/bank_tracker_{timestamp}.csv'
-                output_file_path = f'data/bank_tracker.csv'
-                df_trs.to_csv(output_file_path, index=False)
+                df_trs.to_csv(FILE_NAME, index=False)
 
-                print("Transaction added successfully!")
+                print(f"{df_trs} \nTransaction added successfully!")
             elif num == '4':    #4. Edit a Transaction
+                print(df_trs)
                 idx = input("Enter the index of the transaction to edit:")
                 index = int(idx)
                 if index in df_trs.index:
@@ -85,16 +84,24 @@ class MainController:
                     if edit_category:
                         df_trs.loc[index, 'Category'] = edit_category
 
+                    # 날짜 순으로 정렬
+                    df_trs = df_trs.sort_values(by='Date', ascending=False)
+
+                    # .csv 파일로 저장
+                    df_trs.to_csv(FILE_NAME, index=False)
+
                     print(f"{df_trs} \nTransaction updated successfully!")
                 else:
                     print("Invalid index.")
             elif num == '5':    #5. Delete a Transaction
+                print(df_trs)
                 idx = input("Enter the index of the transaction to delete:")
                 index = int(idx)
                 if index in df_trs.index:
                     df_trs = df_trs.drop(index)
-                    if df_trs is not None:
-                        print(f"{df_trs} \nTransaction deleted successfully!")
+                    # .csv 파일로 저장
+                    df_trs.to_csv(FILE_NAME, index=False)
+                    print(f"{df_trs} \nTransaction deleted successfully!")
                 else:
                     print("Invalid index.")
             elif num == '6':    # 6. Analyze Spending by Category
@@ -123,11 +130,31 @@ class MainController:
                 monthly_sums = df_trs.groupby('Month')['Amount'].sum()
                 print(monthly_sums)
 
-                plt.pie(df_trs['monthly_sums'])
+                plt.figure(figsize=(10, 6))
+                monthly_sums.plot(kind='bar', color='skyblue')
+                plt.title('Monthly amount')
+                plt.xlabel('Month')
+                plt.ylabel('Total')
                 plt.show()
 
+                # 카테고리별 지출금액
+                category_expenses = df_trs.groupby('Category')['Amount'].sum()
+
+                plt.figure(figsize=(7, 7))
+                category_expenses.plot(
+                    kind='pie',
+                    autopct='%1.1f%%',  # 퍼센트 표시
+                    colors=plt.cm.Pastel1.colors,
+                    legend=False  # 범례 제거
+                )
+                plt.title('Expenditure Amount by Category')
+                plt.ylabel('')
+                plt.show()
 
             elif num == '10':   # 10. Save Transactions to CSV
                 file_name = input("Enter file name to save (e.g., 'transactions.csv'):")
                 df_trs.to_csv(f"data/{file_name}", index=False)
                 print(f"Transactions saved to {file_name} successfully!")
+            elif num == '11':
+                print("Exiting the Personal Finance Tracker. Goodbye!")
+                break

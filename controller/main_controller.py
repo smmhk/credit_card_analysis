@@ -130,11 +130,31 @@ class MainController:
                 monthly_sums = df_trs.groupby('Month')['Amount'].sum()
                 print(monthly_sums)
 
-                plt.pie(df_trs['monthly_sums'])
+                plt.figure(figsize=(10, 6))
+                monthly_sums.plot(kind='bar', color='skyblue')
+                plt.title('Monthly amount')
+                plt.xlabel('Month')
+                plt.ylabel('Total')
                 plt.show()
 
+                # 카테고리별 지출금액
+                category_expenses = df_trs.groupby('Category')['Amount'].sum()
+
+                plt.figure(figsize=(7, 7))
+                category_expenses.plot(
+                    kind='pie',
+                    autopct='%1.1f%%',  # 퍼센트 표시
+                    colors=plt.cm.Pastel1.colors,
+                    legend=False  # 범례 제거
+                )
+                plt.title('Expenditure Amount by Category')
+                plt.ylabel('')
+                plt.show()
 
             elif num == '10':   # 10. Save Transactions to CSV
                 file_name = input("Enter file name to save (e.g., 'transactions.csv'):")
                 df_trs.to_csv(f"data/{file_name}", index=False)
                 print(f"Transactions saved to {file_name} successfully!")
+            elif num == '11':
+                print("Exiting the Personal Finance Tracker. Goodbye!")
+                break

@@ -1,4 +1,4 @@
-# 메뉴를 표시하고 출력
+# print Menu
 
 class MenuView:
 

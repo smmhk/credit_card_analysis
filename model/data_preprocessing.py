@@ -15,22 +15,21 @@ class DataPreprocessing:
         df = pd.DataFrame(data)
 
         # cleaning
-        # 2-1. drop : This is only for analyzing my expenses so I will remove the 'Payback' column.
+        # 2-1. drop : This is only for analyzing my expenses, so I will remove the 'Payback' column.
         df = df.drop('Payback', axis=1)
 
-        # 2-2 NULL 값 체크 후 값이 없는 행 전체를 delete 할꺼.
+        # 2-2 Delete entire row if there is null value in specific column.
         missing_values = df.isnull().sum()
-        print(missing_values)
+        print(f"Missing values : \n {missing_values}")
 
         null_col = df.columns[df.isnull().sum() > 0]
-        # print(null_col.values)
-        # df_cleaned = df.dropna(subset=['Amount'])
+        print(f"{null_col.values} has null values.")
         df_cleaned = df.dropna(subset=null_col.values)
 
         #todo 데이터 클리닝 더 해야되는데 일단 다음 스텝으로 고
         print(df_cleaned.info())
         # 처음부터 'Date' 컬럼의 타입을 datetime으로 바꿔놔야겠어.
-        df_cleaned['Date'] = pd.to_datetime(df_cleaned['Date'])
+        df_cleaned['Date'] = pd.to_datetime(df_cleaned['Date']).copy()
         print(df_cleaned.info())
         # todo When 'data cleaning' is done, I'm going to save it as a csv file
 

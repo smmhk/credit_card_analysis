@@ -20,7 +20,6 @@ It is developed using the MVC pattern to ensure maintainability and scalability
 - **Data type**: CSV 📄
 
 ---
-
 ## 🗂 Folder Structure
 ```plaintext
 credit_card_analysis/

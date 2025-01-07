@@ -1,4 +1,4 @@
-# 🏦 bank_tracker
+# 💸 bank_tracker
 
 ✨ **bank_tracker** is a Python-based project for efficiently managing credit card expense records.
 It is developed using the MVC pattern to ensure maintainability and scalability  
